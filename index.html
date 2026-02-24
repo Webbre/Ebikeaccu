@@ -20,47 +20,50 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            /* Zorgt dat de body altijd precies de hoogte van je scherm is, ook met menu-balken */
+            height: 100vh;
+            height: 100dvh; 
             font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
         }
 
         .app-container {
             width: 100%;
             max-width: 400px;
-            height: 100vh;
-            max-height: 850px;
+            height: 100%; 
             background-color: var(--bg-color);
             display: flex;
             flex-direction: column;
             border-radius: 40px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            overflow: hidden;
+            /* Als het scherm écht te klein is, mag je scrollen ipv dat knoppen verdwijnen */
+            overflow-y: auto; 
         }
 
         @media (max-width: 400px) {
-            .app-container { border-radius: 0; height: 100dvh; max-height: none; }
+            .app-container { border-radius: 0; }
         }
 
-        /* Scherm met de resultaten */
         .display {
             flex: 1; 
+            min-height: 180px; /* Zorgt dat het schermpje niet te klein wordt geplet */
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             align-items: flex-end;
-            padding: 30px 25px;
+            padding: 20px 25px;
         }
 
         .battery-box {
             align-self: center;
             width: 45px;
-            height: 85px;
+            height: 80px;
             border: 3px solid #555;
             border-radius: 8px;
             position: relative;
             padding: 3px;
             margin-bottom: auto; 
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .battery-box::after {
@@ -82,7 +85,7 @@
 
         .status-label {
             color: var(--btn-orange);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 5px;
             min-height: 1.5rem;
             text-align: right;
@@ -90,47 +93,48 @@
 
         .main-value {
             color: white;
-            font-size: 4.5rem;
+            font-size: 4rem; /* Iets kleiner gemaakt voor de zekerheid */
             font-weight: 300;
             margin: 0;
             line-height: 1.1;
             text-align: right;
         }
 
-        /* Aangepast 3-koloms toetsenbord */
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            padding: 25px;
-            padding-bottom: 35px;
+            gap: 10px; /* Marges wat kleiner gemaakt */
+            padding: 15px; 
+            padding-bottom: 25px;
             width: 100%;
         }
 
         .btn {
             width: 100%;
             aspect-ratio: 1 / 1; 
+            max-height: 90px; /* Knoppen mogen niet extreem groot worden op brede telefoons */
             border: none;
             border-radius: 50%;
-            font-size: 2rem;
+            font-size: 1.8rem;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             color: white;
             transition: filter 0.1s;
+            margin: 0 auto;
         }
 
         .btn:active { filter: brightness(1.4); }
 
         .btn-gray { background-color: var(--btn-gray); }
-        .btn-light { background-color: var(--btn-light); color: black; font-size: 1.5rem; }
+        .btn-light { background-color: var(--btn-light); color: black; font-size: 1.4rem; }
         
         .btn-calc {
             background-color: var(--btn-orange);
             grid-column: span 3;
             aspect-ratio: auto;
-            height: 70px;
+            height: 65px; /* Iets minder hoog gemaakt */
             border-radius: 35px;
             font-size: 1.3rem;
             font-weight: bold;
@@ -164,7 +168,7 @@
 
             <button type="button" class="btn btn-light" onclick="reset()">AC</button>
             <button type="button" class="btn btn-gray" onclick="press(0)">0</button>
-            <button type="button" class="btn btn-light" onclick="del()">?</button>
+            <button type="button" class="btn btn-light" onclick="del()">⌫</button>
 
             <button type="button" class="btn btn-calc" onclick="bereken()">BEREKEN TOT 80%</button>
         </div>
@@ -179,10 +183,15 @@
                 input = "";
                 isResultaatTonen = false;
             }
-            if (input.length < 3) {
+
+            // Nieuw: Voorkom de "089" fout! 
+            // Als er alleen nog maar een 0 staat, overschrijf deze dan met het nieuwe cijfer.
+            if (input === "0") {
+                input = num.toString();
+            } else if (input.length < 3) {
                 input += num;
-                toonInvoer();
             }
+            toonInvoer();
         }
 
         function del() {
@@ -211,28 +220,4 @@
 
         function bereken() {
             const huidig = parseInt(input === "" ? "0" : input);
-            const doel = 80;
-            const snelheid = 25; 
-            
-            if (huidig >= doel) {
-                document.getElementById('label').innerText = "Accu is al vol genoeg";
-                document.getElementById('val').innerText = "0m";
-            } else {
-                const urenNodig = (doel - huidig) / snelheid;
-                const min = Math.round(urenNodig * 60);
-                const h = Math.floor(min / 60);
-                const m = min % 60;
-                
-                document.getElementById('label').innerText = `Laadtijd nodig tot ${doel}%`;
-                
-                if (h > 0) {
-                    document.getElementById('val').innerText = `${h}u ${m}m`;
-                } else {
-                    document.getElementById('val').innerText = `${m}m`;
-                }
-            }
-            isResultaatTonen = true;
-        }
-    </script>
-</body>
-</html>
+            const doel =
