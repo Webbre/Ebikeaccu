@@ -20,7 +20,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Zorgt dat de body altijd precies de hoogte van je scherm is, ook met menu-balken */
             height: 100vh;
             height: 100dvh; 
             font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -36,7 +35,6 @@
             flex-direction: column;
             border-radius: 40px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            /* Als het scherm écht te klein is, mag je scrollen ipv dat knoppen verdwijnen */
             overflow-y: auto; 
         }
 
@@ -46,7 +44,7 @@
 
         .display {
             flex: 1; 
-            min-height: 180px; /* Zorgt dat het schermpje niet te klein wordt geplet */
+            min-height: 180px; 
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -93,7 +91,7 @@
 
         .main-value {
             color: white;
-            font-size: 4rem; /* Iets kleiner gemaakt voor de zekerheid */
+            font-size: 4rem; 
             font-weight: 300;
             margin: 0;
             line-height: 1.1;
@@ -103,7 +101,7 @@
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px; /* Marges wat kleiner gemaakt */
+            gap: 10px; 
             padding: 15px; 
             padding-bottom: 25px;
             width: 100%;
@@ -112,7 +110,7 @@
         .btn {
             width: 100%;
             aspect-ratio: 1 / 1; 
-            max-height: 90px; /* Knoppen mogen niet extreem groot worden op brede telefoons */
+            max-height: 90px; 
             border: none;
             border-radius: 50%;
             font-size: 1.8rem;
@@ -134,7 +132,7 @@
             background-color: var(--btn-orange);
             grid-column: span 3;
             aspect-ratio: auto;
-            height: 65px; /* Iets minder hoog gemaakt */
+            height: 65px; 
             border-radius: 35px;
             font-size: 1.3rem;
             font-weight: bold;
@@ -184,12 +182,10 @@
                 isResultaatTonen = false;
             }
 
-            // Nieuw: Voorkom de "089" fout! 
-            // Als er alleen nog maar een 0 staat, overschrijf deze dan met het nieuwe cijfer.
             if (input === "0") {
-                input = num.toString();
+                input = String(num);
             } else if (input.length < 3) {
-                input += num;
+                input = input + String(num);
             }
             toonInvoer();
         }
@@ -220,4 +216,28 @@
 
         function bereken() {
             const huidig = parseInt(input === "" ? "0" : input);
-            const doel =
+            const doel = 80;
+            const snelheid = 25; 
+            
+            if (huidig >= doel) {
+                document.getElementById('label').innerText = "Accu is al vol genoeg";
+                document.getElementById('val').innerText = "0m";
+            } else {
+                const urenNodig = (doel - huidig) / snelheid;
+                const min = Math.round(urenNodig * 60);
+                const h = Math.floor(min / 60);
+                const m = min % 60;
+                
+                document.getElementById('label').innerText = "Laadtijd nodig tot " + doel + "%";
+                
+                if (h > 0) {
+                    document.getElementById('val').innerText = h + "u " + m + "m";
+                } else {
+                    document.getElementById('val').innerText = m + "m";
+                }
+            }
+            isResultaatTonen = true;
+        }
+    </script>
+</body>
+</html>
