@@ -17,15 +17,14 @@
         body {
             margin: 0;
             background-color: #1c1c1e; 
-            /* Deze regels zetten de app muurvast op het scherm */
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            /* Veilige manier om de app precies 1 scherm hoog te maken zonder scrollen */
+            height: 100vh;
+            height: 100dvh;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow: hidden;
-            touch-action: none; /* Blokkeert het scrollen/schuiven */
+            overflow: hidden; 
         }
 
         .app-container {
@@ -35,21 +34,18 @@
             background-color: var(--bg-color);
             display: flex;
             flex-direction: column;
-            border-radius: 40px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            overflow: hidden; 
-            position: relative; /* Nodig om de batterij linksboven te positioneren */
+            position: relative; /* Zorgt dat de batterij weet waar linksboven is */
         }
 
         @media (max-width: 400px) {
             .app-container { border-radius: 0; }
         }
 
-        /* De batterij linksboven */
+        /* Batterij muurvast linksboven */
         .battery-box {
             position: absolute;
-            top: 35px;
-            left: 35px;
+            top: 25px;
+            left: 25px;
             width: 35px;
             height: 70px;
             border: 3px solid #555;
@@ -70,18 +66,18 @@
             width: 100%;
             height: 0%;
             background: linear-gradient(to top, #ff453a, #32d74b);
-            border-radius: 4px;
+            border-radius: 3px;
             transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* Ruimte voor de tekst rechtsmidden */
+        /* Tekstgedeelte */
         .display {
-            flex: 1; 
+            flex: 1; /* Neemt alle ruimte in BOVEN de knoppen */
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             align-items: flex-end;
-            padding: 20px 35px; /* Dezelfde marge als de knoppen */
+            padding: 20px 30px; 
         }
 
         .status-label {
@@ -101,20 +97,20 @@
             text-align: right;
         }
 
-        /* Knoppen met meer zwarte ruimte (padding links en rechts is nu 35px) */
+        /* Toetsenbord met meer padding voor bredere zwarte randen */
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px; 
-            padding: 10px 35px 35px 35px; 
+            gap: 12px; 
+            padding: 10px 30px 35px 30px; 
             width: 100%;
         }
 
         .btn {
             width: 100%;
-            max-width: 75px; /* Zorgt dat ze niet te breed/ovaal worden */
-            height: auto;
+            max-width: 80px; /* Zorgt dat ze nooit te breed en dus ovaal worden */
             aspect-ratio: 1 / 1; 
+            margin: 0 auto; /* Zet de knop in het midden van zijn onzichtbare vakje */
             border: none;
             border-radius: 50%;
             font-size: 1.8rem;
@@ -124,19 +120,18 @@
             cursor: pointer;
             color: white;
             transition: filter 0.1s;
-            margin: 0 auto;
         }
 
         .btn:active { filter: brightness(1.4); }
 
         .btn-gray { background-color: var(--btn-gray); }
-        .btn-light { background-color: var(--btn-light); color: black; font-size: 1.4rem; }
+        .btn-light { background-color: var(--btn-light); color: black; font-size: 1.5rem; font-weight: 500;}
         
         .btn-calc {
             background-color: var(--btn-orange);
             grid-column: span 3;
-            aspect-ratio: auto;
-            max-width: 100%; /* De bereken knop mag wél breed zijn */
+            aspect-ratio: auto; /* De berekenknop mag wél een balk zijn */
+            max-width: 100%;
             height: 65px; 
             border-radius: 35px;
             font-size: 1.3rem;
@@ -159,4 +154,91 @@
 
         <div class="keypad">
             <button type="button" class="btn btn-gray" onclick="press(1)">1</button>
-            <button type="button"
+            <button type="button" class="btn btn-gray" onclick="press(2)">2</button>
+            <button type="button" class="btn btn-gray" onclick="press(3)">3</button>
+
+            <button type="button" class="btn btn-gray" onclick="press(4)">4</button>
+            <button type="button" class="btn btn-gray" onclick="press(5)">5</button>
+            <button type="button" class="btn btn-gray" onclick="press(6)">6</button>
+
+            <button type="button" class="btn btn-gray" onclick="press(7)">7</button>
+            <button type="button" class="btn btn-gray" onclick="press(8)">8</button>
+            <button type="button" class="btn btn-gray" onclick="press(9)">9</button>
+
+            <button type="button" class="btn btn-light" onclick="reset()">AC</button>
+            <button type="button" class="btn btn-gray" onclick="press(0)">0</button>
+            <button type="button" class="btn btn-light" onclick="del()">⌫</button>
+
+            <button type="button" class="btn btn-calc" onclick="bereken()">BEREKEN TOT 80%</button>
+        </div>
+    </div>
+
+    <script>
+        let input = "";
+        let isResultaatTonen = false;
+        
+        function press(num) {
+            if (isResultaatTonen) {
+                input = "";
+                isResultaatTonen = false;
+            }
+
+            if (input === "0") {
+                input = String(num);
+            } else if (input.length < 3) {
+                input = input + String(num);
+            }
+            toonInvoer();
+        }
+
+        function del() {
+            if (isResultaatTonen) {
+                reset();
+                return;
+            }
+            input = input.slice(0, -1);
+            toonInvoer();
+        }
+
+        function reset() {
+            input = "";
+            isResultaatTonen = false;
+            toonInvoer();
+        }
+
+        function toonInvoer() {
+            const v = input === "" ? "0" : input;
+            document.getElementById('label').innerText = "Huidige accustand";
+            document.getElementById('val').innerText = v + "%";
+            
+            const p = Math.min(parseInt(v) || 0, 100);
+            document.getElementById('fill').style.height = p + "%";
+        }
+
+        function bereken() {
+            const huidig = parseInt(input === "" ? "0" : input);
+            const doel = 80;
+            const snelheid = 25; 
+            
+            if (huidig >= doel) {
+                document.getElementById('label').innerText = "Accu is al vol genoeg";
+                document.getElementById('val').innerText = "0m";
+            } else {
+                const urenNodig = (doel - huidig) / snelheid;
+                const min = Math.round(urenNodig * 60);
+                const h = Math.floor(min / 60);
+                const m = min % 60;
+                
+                document.getElementById('label').innerText = "Laadtijd nodig tot " + doel + "%";
+                
+                if (h > 0) {
+                    document.getElementById('val').innerText = h + "u " + m + "m";
+                } else {
+                    document.getElementById('val').innerText = m + "m";
+                }
+            }
+            isResultaatTonen = true;
+        }
+    </script>
+</body>
+</html>
