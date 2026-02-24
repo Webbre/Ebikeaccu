@@ -201,3 +201,47 @@
             }
             input = input.slice(0, -1);
             toonInvoer();
+        }
+
+        function reset() {
+            input = "";
+            isResultaatTonen = false;
+            toonInvoer();
+        }
+
+        function toonInvoer() {
+            const v = input === "" ? "0" : input;
+            document.getElementById('label').innerText = "Huidige accustand";
+            document.getElementById('val').innerText = v + "%";
+            
+            const p = Math.min(parseInt(v) || 0, 100);
+            document.getElementById('fill').style.height = p + "%";
+        }
+
+        function bereken() {
+            const huidig = parseInt(input === "" ? "0" : input);
+            const doel = 80;
+            const snelheid = 25; 
+            
+            if (huidig >= doel) {
+                document.getElementById('label').innerText = "Accu is al vol genoeg";
+                document.getElementById('val').innerText = "0m";
+            } else {
+                const urenNodig = (doel - huidig) / snelheid;
+                const min = Math.round(urenNodig * 60);
+                const h = Math.floor(min / 60);
+                const m = min % 60;
+                
+                document.getElementById('label').innerText = "Laadtijd nodig tot " + doel + "%";
+                
+                if (h > 0) {
+                    document.getElementById('val').innerText = h + "u " + m + "m";
+                } else {
+                    document.getElementById('val').innerText = m + "m";
+                }
+            }
+            isResultaatTonen = true;
+        }
+    </script>
+</body>
+</html>
